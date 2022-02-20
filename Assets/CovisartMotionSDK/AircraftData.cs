@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
-using SimulatorBackgroundWorkerService.CommonClasses;
+﻿using SimulatorServiceUnity.CommonClasses;
 using UnityEngine;
 
 namespace CovisartMotionSDK
@@ -12,39 +9,39 @@ namespace CovisartMotionSDK
         public double axisX;
         public double axisY;
         public double axisZ;
-        public double axisW;
         public Vector3 eulerAngle;
         public Vector3 position;
 
 
-        private SimulatorCommandData commandaData;
-        void Awake()
+        private SimulatorCommandData _commandData;
+        private void OnEnable()
         {
-            commandaData = new SimulatorCommandData();
+            _commandData = new SimulatorCommandData();
         }
-        void Update()
+
+        private void Update()
         {
-            axisX = jet.transform.eulerAngles.x ;
-            axisY = jet.transform.eulerAngles.y ;
-            axisZ = jet.transform.eulerAngles.z ;
-            axisW = jet.transform.rotation.w ;
+            var localEulerAngles = jet.transform.localEulerAngles;
+            axisX = localEulerAngles.x ;
+            axisY = localEulerAngles.y ;
+            axisZ = localEulerAngles.z ;
             eulerAngle = jet.transform.eulerAngles;
-            position = jet.transform.position;
+            position = jet.transform.localPosition;
         }
         
         public void StartDataTransfer()
         {
-            SendData(commandaData.OpenConnection());
-            SendData(commandaData.PowerOn());
-            SendData(commandaData.EnableExactPositonX());
-            SendData(commandaData.EnableExactPositonY());
-            var state = SendData(commandaData.GetState());
+            SendData(_commandData.OpenConnection());
+            SendData(_commandData.PowerOn());
+            SendData(_commandData.EnableExactPositionX());
+            SendData(_commandData.EnableExactPositionY());
+            var state = SendData(_commandData.GetState());
             Debug.Log(state);
         }
 
         private static  string SendData(byte[] bits)
         {
-            return MyTcpClient.Connect("127.0.0.1", bits);
+            return SimulatorTcpClient.Connect("127.0.0.1", bits);
         }
     }
 }
